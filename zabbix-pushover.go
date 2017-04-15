@@ -14,6 +14,7 @@ type PushoverMessage struct {
 	user    string
 	title   string
 	message string
+	devices string
 }
 
 func (msg *PushoverMessage) Send() error {
@@ -23,6 +24,9 @@ func (msg *PushoverMessage) Send() error {
 	data.Set("message", msg.message)
 	if len(msg.title) > 0 {
 		data.Set("title", msg.title)
+	}
+	if len(msg.devices) > 0 {
+		data.Set("device", msg.devices)
 	}
 	_, err := http.PostForm("https://api.pushover.net/1/messages.json", data)
 	return err
@@ -51,15 +55,29 @@ func init() {
 }
 
 func main() {
+	usage := fmt.Sprintf("usage: %s <user>[:device[,device...]] <title> <body>\n", os.Args[0])
 	if len(os.Args) != 4 {
-		fmt.Fprintf(os.Stderr, "usage: %s <user> <subject> <body>\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, usage)
 		os.Exit(1)
 	}
+
+	parts := strings.Split(os.Args[1], ":")
+	if len(parts) > 2 {
+		fmt.Fprintf(os.Stderr, usage)
+		os.Exit(1)
+	}
+	user := parts[0]
+	var devices string
+	if len(parts) == 2 {
+		devices = parts[1]
+	}
+
 	p := PushoverMessage{
 		token,
-		os.Args[1],
+		user,
 		os.Args[2],
 		os.Args[3],
+		devices,
 	}
 	p.Send()
 }
