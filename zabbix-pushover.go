@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-type PushoverMessage struct {
+type pushoverMessage struct {
 	token   string
 	user    string
 	title   string
@@ -17,7 +17,7 @@ type PushoverMessage struct {
 	devices string
 }
 
-func (msg *PushoverMessage) Send() error {
+func (msg *pushoverMessage) Send() error {
 	data := url.Values{}
 	data.Set("token", msg.token)
 	data.Set("user", msg.user)
@@ -72,7 +72,7 @@ func main() {
 		devices = parts[1]
 	}
 
-	p := PushoverMessage{
+	p := pushoverMessage{
 		token,
 		user,
 		os.Args[2],
